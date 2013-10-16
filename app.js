@@ -1,7 +1,11 @@
 var express = require('express');
+var socketio = require('socket.io')
 var walk    = require('walk');
 
-var log = {info: console.log, error: console.error};
+var log = require("winston");
+var fs = require("fs");
+
+var ViewerHandler = require("./viewer");
 
 var Application = function() {
 	
@@ -18,6 +22,9 @@ var Application = function() {
 		// initialize web server
 		_this.startWebServer();
 
+		// connect to client
+		_this.client = new ViewerHandler(_this.io);
+
 		return exports;
 	}
 
@@ -28,6 +35,12 @@ var Application = function() {
 
 		log.info("listening on port 3000!")
 		_this.server.listen(3000);
+
+		http = require('http')
+  		http = http.createServer(_this.server)
+
+		log.info("starting web socket server...")
+		_this.io = socketio.listen(http)
 	}
 
 	_this.getActions = function(cb) {
