@@ -1,13 +1,38 @@
-// if you checked "fancy-settings" in extensionizr.com, uncomment this lines
+var socket = io.connect('http://localhost:3000');
 
-// var settings = new Store("settings", {
-//     "sample_setting": "This is how you use Store.js to remember values"
-// });
+var BackgroundHandler = function(socket) {
 
+	var stream = [];
+	var currentlyPlaying = null;
 
-//example of using a message handler from the inject scripts
-chrome.extension.onMessage.addListener(
-  function(request, sender, sendResponse) {
-  	chrome.pageAction.show(sender.tab.id);
-    sendResponse();
-  });
+	var play = function(location) {
+
+		chrome.tabs.create({
+
+			url: location
+
+		}, function(){
+
+			console.log("Playing: " + location)
+		})
+	}
+
+	var init = function() {
+
+		socket.on("stream/success", function(data) {
+
+			stream = data.stream || [];
+
+			if(!currentlyPlaying) {
+				play(stream.pop())
+			}
+		});
+
+		// and here we go...
+		socket.emit("stream/get", {});
+	}
+
+	return init();
+}
+
+var bg = new BackgroundHandler(socket);

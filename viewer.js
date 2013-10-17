@@ -1,3 +1,6 @@
+var log = require("winston");
+var crypto = require("crypto");
+
 var ViewerHandler = function(io) {
 
 	var _this = this;
@@ -8,6 +11,8 @@ var ViewerHandler = function(io) {
 	_this.clients = [];
 
 	_this.init = function() {
+
+		_this.connect();
 		return _this.exports;
 	}
 
@@ -19,19 +24,20 @@ var ViewerHandler = function(io) {
 
 			var _id = crypto.randomBytes(20).toString('hex');
 
-			log.info("new client connected, wating handshake...")
+			socket.on('stream/get', function (data) {
 
-			socket.on('handshake/request', function (data) {
-
-				// handshake received, return connection id
-				socket.emit('handshake/success', { 
-					id: _id
+				socket.emit('stream/success', { 
+					stream: ["http://google.com"]
 				});
-
-				console.log("new client connected: " + _id);
 			});
 		});
 	}
+
+	_this.redirect = function(url) {
+
+		return null;
+
+	}; _this.exports.redirect = _this.redirect;
 
 	return _this.init();
 }

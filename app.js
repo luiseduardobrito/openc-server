@@ -1,5 +1,6 @@
 var express = require('express');
 var socketio = require('socket.io')
+var http = require('http');
 var walk    = require('walk');
 
 var log = require("winston");
@@ -14,6 +15,8 @@ var Application = function() {
 	_this.exports = {};
 	_this.actions = [];
 
+	_this.client = null;
+
 	_this.init = function(){
 
 		// initialize actions
@@ -22,9 +25,6 @@ var Application = function() {
 		// initialize web server
 		_this.startWebServer();
 
-		// connect to client
-		_this.client = new ViewerHandler(_this.io);
-
 		return exports;
 	}
 
@@ -32,15 +32,17 @@ var Application = function() {
 		
 		log.info("starting express web server...")
 		_this.server = express();
-
-		log.info("listening on port 3000!")
-		_this.server.listen(3000);
-
-		http = require('http')
-  		http = http.createServer(_this.server)
+  		_this.httpServer = http.createServer(_this.server)
 
 		log.info("starting web socket server...")
-		_this.io = socketio.listen(http)
+		_this.io = socketio.listen(_this.httpServer)
+		//_this.io.set('log level', 1);
+
+		log.info("connecting with client viewer...")
+		_this.client = new ViewerHandler(_this.io);
+
+		log.info("listening on port 3000!")
+		_this.httpServer.listen(3000);
 	}
 
 	_this.getActions = function(cb) {
