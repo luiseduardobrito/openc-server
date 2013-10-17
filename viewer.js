@@ -24,7 +24,14 @@ var ViewerHandler = function(io, cb) {
 		cb = cb || function(){};
 
 		_this.io.sockets.on('connection', function (socket) {
+
 			_this.socket = socket;
+			_this.socket.on("stream/push", function(data) {
+
+				_this.push(data.url)
+
+			});
+
 			cb();
 		});
 	}

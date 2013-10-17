@@ -63,11 +63,12 @@ var Application = function() {
 		log.info("starting express web server...")
 		_this.server = express();
   		_this.httpServer = http.createServer(_this.server)
-  		//_this.server.use("/", express.static(__dirname + "/static"));
+
+  		_this.server.use("/", express.static(__dirname + "/public"));
 
 		log.info("starting web socket server...")
 		_this.io = socketio.listen(_this.httpServer)
-		//_this.io.set('log level', 1);
+		_this.io.set('log level', 1);
 
 		// TODO: encapsulate port choosing
 		log.info("listening on port 3000!")
@@ -85,7 +86,7 @@ var Application = function() {
 		addr = addr + ":3000";
 		var fs = require('fs');
 
-		var file = fs.createWriteStream("static/qrcode.png");
+		var file = fs.createWriteStream("public/assets/qrcode.png");
 		var request = http.get("http://chart.googleapis.com/chart?cht=qr&chs=200x200&chl=http://" + addr, function(response) {
 			response.pipe(file);
 			log.info("qrcoded ok!")

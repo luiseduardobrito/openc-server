@@ -1,0 +1,56 @@
+	<!DOCTYPE html>
+<!--[if lt IE 7]>      <html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]-->
+<!--[if IE 7]>         <html class="no-js lt-ie9 lt-ie8"> <![endif]-->
+<!--[if IE 8]>         <html class="no-js lt-ie9"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js"> <!--<![endif]-->
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>openc-server - mobile chromecast alpha</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    </head>
+    <body>
+        <!--[if lt IE 7]>
+            <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+        <![endif]-->
+
+        <!-- Add your site or application content here -->
+        <p><b>openc-server - mobile chromecast alpha</b></p>
+        <p>
+            HOST: <span id="socket-host"></span><br /><br />
+        	http:// <input type="text" id="url" placeholder="www.google.com">
+        	<br /><input type="button" id="submit-btn" value="Play" style="">
+        	<span id="loading-txt" style="display: none">Connecting...</span>
+        </p>
+
+        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+        <script src="assets/socket.io.js"></script>
+
+        <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+        <script>
+        	
+            var socket = io.connect(document.location.origin);
+            $("#socket-host").html(document.location.origin);
+
+            $(document).ready(function(){
+
+            	$("#submit-btn").click(function(){
+
+            		$("#submit-btn").css("display", "none");
+            		$("#loading-txt").html("Connecting...");
+            		$("#loading-txt").css("display", "");            		
+
+					socket.emit('stream/push', { 
+						url: "http://" + $("#url").val()
+					});	
+
+					$("#submit-btn").css("display", "");
+            		$("#loading-txt").css("display", "none");					
+            	})
+            })
+        </script>
+    </body>
+</html>
