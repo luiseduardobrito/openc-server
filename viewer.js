@@ -1,18 +1,21 @@
 var log = require("winston");
 var crypto = require("crypto");
 
-var ViewerHandler = function(io) {
+var ViewerHandler = function(io, cb) {
 
 	var _this = this;
 
 	_this.exports = {};
+
 	_this.io = io;
+	_this.socket = null;
 
-	_this.clients = [];
+	_this.init = function(cb) {
 
-	_this.init = function() {
+		cb = cb || function(){};
 
-		_this.connect();
+		_this.connect(cb);
+
 		return _this.exports;
 	}
 
@@ -21,25 +24,33 @@ var ViewerHandler = function(io) {
 		cb = cb || function(){};
 
 		_this.io.sockets.on('connection', function (socket) {
-
-			var _id = crypto.randomBytes(20).toString('hex');
-
-			socket.on('stream/get', function (data) {
-
-				socket.emit('stream/success', { 
-					stream: ["http://google.com"]
-				});
-			});
+			_this.socket = socket;
+			cb();
 		});
 	}
 
-	_this.redirect = function(url) {
+	_this.push = function(url) {
 
-		return null;
+		if(!url) {
 
-	}; _this.exports.redirect = _this.redirect;
+			throw new Error("No url provided");
+		}
 
-	return _this.init();
+		else if(!_this.socket) {
+
+			throw new Error("No client connected");	
+		}
+
+		else {
+
+			_this.socket.emit('stream/push', { 
+				url: url
+			});	
+		}
+
+	}; _this.exports.push = _this.push;
+
+	return _this.init(cb);
 }
 
 module.exports = ViewerHandler;

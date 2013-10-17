@@ -19,17 +19,10 @@ var BackgroundHandler = function(socket) {
 
 	var init = function() {
 
-		socket.on("stream/success", function(data) {
-
-			stream = data.stream || [];
-
-			if(!currentlyPlaying) {
-				play(stream.pop())
-			}
+		socket.on("stream/push", function(data) {
+			if(data.url)
+				play(data.url);
 		});
-
-		// and here we go...
-		socket.emit("stream/get", {});
 	}
 
 	return init();

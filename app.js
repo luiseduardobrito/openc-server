@@ -38,11 +38,13 @@ var Application = function() {
 		_this.io = socketio.listen(_this.httpServer)
 		//_this.io.set('log level', 1);
 
-		log.info("connecting with client viewer...")
-		_this.client = new ViewerHandler(_this.io);
-
 		log.info("listening on port 3000!")
 		_this.httpServer.listen(3000);
+
+		log.info("connecting with client viewer...")
+		_this.client = new ViewerHandler(_this.io, function(){
+			log.info("client connected successfully!");
+		});
 	}
 
 	_this.getActions = function(cb) {
@@ -57,7 +59,13 @@ var Application = function() {
 		    var action = require(root + '/' + stat.name);
 		    
 		    for(var k in action)
-		    	_this.server.get("/" + stat.name.split(".js")[0] + "/" + k, action[k]);
+		    	_this.server.get("/" + stat.name.split(".js")[0] + "/" + k, function(req, res){
+
+		    		action[k](req, res, _this.client);
+
+		    	});
+
+		    next();
 
 		});
 
